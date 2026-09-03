@@ -1,0 +1,206 @@
+[
+  {
+    "term_id": "PAT_001",
+    "english": "Patent",
+    "hindi": "पेटेंट",
+    "category": "PATENT",
+    "aliases_en": [],
+    "aliases_hi": [],
+    "do_not_translate": false,
+    "context": "intellectual_property"
+  },
+  {
+    "term_id": "PAT_002",
+    "english": "Patent Application",
+    "hindi": "पेटेंट आवेदन",
+    "category": "PATENT",
+    "aliases_en": ["Patent Filing"],
+    "aliases_hi": ["पेटेंट दाखिल करना"],
+    "do_not_translate": false,
+    "context": "patent_application"
+  },
+  {
+    "term_id": "PAT_003",
+    "english": "Prior Art",
+    "hindi": "पूर्व कला",
+    "category": "PATENT",
+    "aliases_en": ["Existing Technology", "Earlier Art"],
+    "aliases_hi": [],
+    "do_not_translate": false,
+    "context": "patent_search"
+  },
+  {
+    "term_id": "PAT_004",
+    "english": "Novelty",
+    "hindi": "नवीनता",
+    "category": "PATENT",
+    "aliases_en": ["Newness"],
+    "aliases_hi": [],
+    "do_not_translate": false,
+    "context": "patentability"
+  },
+  {
+    "term_id": "PAT_005",
+    "english": "Inventive Step",
+    "hindi": "आविष्कारक कदम",
+    "category": "PATENT",
+    "aliases_en": ["Non-obviousness"],
+    "aliases_hi": [],
+    "do_not_translate": false,
+    "context": "patentability"
+  }
+  ,
+  {
+  "term_id": "PAT_006",
+  "english": "Geographical Indication",
+  "hindi": "भौगोलिक संकेतक",
+  "category": "INTELLECTUAL_PROPERTY",
+  "aliases_en": ["GI", "Appellation of Origin"],
+  "aliases_hi": ["जीआई टैग", "भौगोलिक उपदर्शन"],
+  "do_not_translate": false,
+  "context": "protection of goods based on their specific geographical origin"
+},
+  {
+    "term_id": "PAT_007",
+    "english": "Copyright",
+    "hindi": "कॉपीराइट",
+    "category": "INTELLECTUAL_PROPERTY",
+    "aliases_en": ["Author's Right"],
+    "aliases_hi": ["प्रतिलिप्याधिकार"],
+    "do_not_translate": false,
+    "context": "protection of literary and artistic works"
+  },
+  {
+    "term_id": "PAT_008",
+    "english": "Trademark",
+    "hindi": "ट्रेडमार्क",
+    "category": "INTELLECTUAL_PROPERTY",
+    "aliases_en": ["Brand", "Mark"],
+    "aliases_hi": ["व्यापार चिह्न"],
+    "do_not_translate": false,
+    "context": "brand identity and logos"
+  },
+  {
+    "term_id": "PAT_009",
+    "english": "Trade Secret",
+    "hindi": "व्यापार रहस्य",
+    "category": "INTELLECTUAL_PROPERTY",
+    "aliases_en": ["Confidential Information", "Proprietary Information"],
+    "aliases_hi": ["गोपनीय जानकारी", "ट्रेड सीक्रेट"],
+    "do_not_translate": false,
+    "context": "protection of confidential business information"
+  },
+  {
+    "term_id": "PAT_0010",
+    "english": "Infringement",
+    "hindi": "उल्लंघन",
+    "category": "IP_ENFORCEMENT",
+    "aliases_en": ["Violation", "Breach", "Piracy"],
+    "aliases_hi": ["अतिक्रमण", "अधिकार-हनन"],
+    "do_not_translate": false,
+    "context": "violation of intellectual property rights"
+  }
+  ,
+  {
+    "term_id": "PAT_0011",
+    "english": "Dosha",
+    "hindi": "दोष",
+    "category": "AYURVEDIC_PRINCIPLES",
+    "aliases_en": ["Bio-energy", "Bodily Humor"],
+    "aliases_hi": ["त्रिदोष", "शारीरिक दोष"],
+    "do_not_translate": true,
+    "context": "fundamental bio-elements (Vata, Pitta, Kapha) that govern the body"
+  },
+  {
+    "term_id": "PAT_0012",
+    "english": "Prakriti",
+    "hindi": "प्रकृति",
+    "category": "CONSTITUTION",
+    "aliases_en": ["Body Constitution", "Mind-Body Type", "Innate Nature"],
+    "aliases_hi": ["शारीरिक प्रकृति", "स्वभाव"],
+    "do_not_translate": true,
+    "context": "an individual's unique baseline physical and psychological makeup"
+  },
+  {
+    "term_id": "PAT_0013",
+    "english": "Agni",
+    "hindi": "अग्नि",
+    "category": "PHYSIOLOGY",
+    "aliases_en": ["Digestive Fire", "Metabolic Fire"],
+    "aliases_hi": ["जठराग्नि", "पाचक अग्नि"],
+    "do_not_translate": true,
+    "context": "the body's metabolic and digestive processes essential for health"
+  },
+  {
+    "term_id": "PAT_0014",
+    "english": "Panchakarma",
+    "hindi": "पंचकर्म",
+    "category": "TREATMENT_AND_THERAPY",
+    "aliases_en": ["Detoxification", "Five-fold Purification", "Bio-cleansing"],
+    "aliases_hi": ["शोधन कर्म"],
+    "do_not_translate": true,
+    "context": "comprehensive cleansing and detoxification therapies"
+  },
+  {
+    "term_id": "PAT_0015",
+    "english": "Rasayana",
+    "hindi": "रसायन",
+    "category": "THERAPEUTICS",
+    "aliases_en": ["Rejuvenation Therapy", "Anti-aging", "Vitalizer"],
+    "aliases_hi": ["रसायन चिकित्सा", "पुनर्यौवन"],
+    "do_not_translate": true,
+    "context": "treatments and herbal formulations focused on vitality, immunity, and longevity"
+  }
+,
+  {
+    "term_id": "PAT_0016",
+    "english": "Prior Art",
+    "hindi": "पूर्व कला",
+    "category": "TKDL_LEGAL_FRAMEWORK",
+    "aliases_en": ["Existing Knowledge", "Public Domain Knowledge", "State of the Art"],
+    "aliases_hi": ["पूर्व ज्ञान", "विद्यमान ज्ञान", "पूर्व ज्ञात तकनीक"],
+    "do_not_translate": false,
+    "context": "documented evidence of traditional knowledge used to prevent the wrongful granting of patents"
+  },
+  {
+    "term_id": "PAT_0017",
+    "english": "Biopiracy",
+    "hindi": "जैविक चोरी",
+    "category": "INTELLECTUAL_PROPERTY_THREAT",
+    "aliases_en": ["Biological Theft", "Bio-appropriation"],
+    "aliases_hi": ["बायोपायरेसी", "जैव-चौर्य", "जैविक डकैती"],
+    "do_not_translate": false,
+    "context": "the unauthorized appropriation and commercialization of traditional knowledge and biological resources without compensation"
+  },
+  {
+    "term_id": "PAT_0018",
+    "english": "Traditional Formulation",
+    "hindi": "पारंपरिक योग",
+    "category": "TK_DOCUMENTATION",
+    "aliases_en": ["Classical Preparation", "Medicinal Recipe", "Polyherbal Formulation"],
+    "aliases_hi": ["शास्त्रीय योग", "पारंपरिक नुस्खा", "औषधीय मिश्रण"],
+    "do_not_translate": false,
+    "context": "specific combinations of medicinal ingredients described in ancient texts that are translated and classified in the TKDL database"
+  },
+  {
+    "term_id": "PAT_0019",
+    "english": "Pharmacopoeia",
+    "hindi": "भेषज संहिता",
+    "category": "TK_LITERATURE",
+    "aliases_en": ["Materia Medica", "Dispensatory", "Classical Text"],
+    "aliases_hi": ["औषधकोश", "औषध-ग्रंथ"],
+    "do_not_translate": false,
+    "context": "authoritative treatises or ancient scriptures containing exhaustive details of traditional drugs, their properties, and therapeutic uses"
+  },
+  {
+    "term_id": "PAT_0020",
+    "english": "Biological Resource",
+    "hindi": "जैविक संसाधन",
+    "category": "BIO_DIVERSITY",
+    "aliases_en": ["Bio-resource", "Genetic Resource", "Botanical Resource"],
+    "aliases_hi": ["जैव संसाधन", "आनुवंशिक संसाधन"],
+    "do_not_translate": false,
+    "context": "plants, herbs, and other naturally occurring materials that form the basis of traditional medicine systems like Ayurveda, Unani, and Siddha"
+  }
+
+]
