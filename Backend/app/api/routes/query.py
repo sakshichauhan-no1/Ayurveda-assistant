@@ -10,6 +10,7 @@ from app.rag.retrieval import retrieve_documents
 
 load_dotenv()
 
+
 router = APIRouter(
     prefix="/api/v1",
     tags=["Query"]
@@ -31,7 +32,7 @@ MODEL_NAME = "gemini-3.5-flash"
 async def query_assistant(request: QueryRequest):
 
     try:
-        # 1. Retrieve relevant passages from the Patents Act
+        # 1. Retrieve relevant passages from the legal database
         retrieved_documents = retrieve_documents(
             request.query,
             top_k=5
@@ -60,6 +61,7 @@ async def query_assistant(request: QueryRequest):
 SOURCE {index}
 Source: {document["source_name"]}
 Page: {document["page_number"]}
+Section: {document.get("section")}
 
 TEXT:
 {document["text"]}
@@ -115,7 +117,7 @@ RULES:
                 {
                     "source_name": document["source_name"],
                     "page_number": document["page_number"],
-                    "section": None,
+                    "section": document.get("section"),
                     "highlight_text": document["text"]
                 }
             )

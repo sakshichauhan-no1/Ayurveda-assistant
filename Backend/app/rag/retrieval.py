@@ -1,3 +1,4 @@
+import re
 import chromadb
 from sentence_transformers import SentenceTransformer
 
@@ -5,6 +6,10 @@ from sentence_transformers import SentenceTransformer
 CHROMA_DIR = "app/data/vector_db"
 COLLECTION_NAME = "patents_act"
 MODEL_NAME = "all-MiniLM-L6-v2"
+
+# Maximum distance allowed for a retrieved document.
+# Lower distance = more relevant.
+MAX_DISTANCE = 0.95
 
 
 # Load model once when the application starts.
@@ -17,9 +22,28 @@ client = chromadb.PersistentClient(path=CHROMA_DIR)
 collection = client.get_collection(name=COLLECTION_NAME)
 
 
+def extract_section(text: str):
+    """
+    Try to extract the section number from a legal text chunk.
+    """
+
+    match = re.search(
+        r"(?m)^\s*(\d+)\.\s+([A-Z][^\n]+)",
+        text
+    )
+
+    if match:
+        return f"Section {match.group(1)}"
+
+    return None
+
+
 def retrieve_documents(query: str, top_k: int = 5):
     """
-    Retrieve the most relevant chunks from the Patents Act vector database.
+    Retrieve relevant chunks from the Patents Act vector database.
+
+    Only chunks whose semantic distance is below MAX_DISTANCE
+    are returned.
     """
 
     query_embedding = model.encode(query).tolist()
@@ -40,6 +64,11 @@ def retrieve_documents(query: str, top_k: int = 5):
         metadatas,
         distances
     ):
+
+        # Ignore weak semantic matches.
+        if distance > MAX_DISTANCE:
+            continue
+
         retrieved_documents.append(
             {
                 "text": document,
@@ -48,6 +77,7 @@ def retrieve_documents(query: str, top_k: int = 5):
                     "The Patents Act, 1970"
                 ),
                 "page_number": metadata.get("page_number"),
+                "section": extract_section(document),
                 "distance": distance
             }
         )
