@@ -28,6 +28,31 @@ client = genai.Client(api_key=api_key)
 MODEL_NAME = "gemini-3.5-flash"
 
 
+def calculate_confidence(retrieved_documents):
+    """
+    Calculate confidence based on the strongest retrieved evidence.
+
+    Lower Chroma distance means stronger semantic similarity.
+    This represents retrieval confidence, not legal certainty.
+    """
+
+    if not retrieved_documents:
+        return "low"
+
+    best_distance = min(
+        document["distance"]
+        for document in retrieved_documents
+    )
+
+    if best_distance <= 0.70:
+        return "high"
+
+    if best_distance <= 0.85:
+        return "medium"
+
+    return "low"
+
+
 @router.post("/query", response_model=QueryResponse)
 async def query_assistant(request: QueryRequest):
 
@@ -49,7 +74,12 @@ async def query_assistant(request: QueryRequest):
                 needs_human_review=True
             )
 
-        # 2. Build the evidence supplied to Gemini
+        # 2. Calculate retrieval confidence
+        confidence = calculate_confidence(
+            retrieved_documents
+        )
+
+        # 3. Build evidence for Gemini
         evidence_parts = []
 
         for index, document in enumerate(
@@ -62,6 +92,7 @@ SOURCE {index}
 Source: {document["source_name"]}
 Page: {document["page_number"]}
 Section: {document.get("section")}
+Retrieval distance: {document["distance"]}
 
 TEXT:
 {document["text"]}
@@ -70,12 +101,15 @@ TEXT:
 
         evidence = "\n".join(evidence_parts)
 
-        # 3. Tell Gemini to answer ONLY from retrieved evidence
+        # 4. Build a strict evidence-grounded prompt
         prompt = f"""
 You are an Indian legal information assistant.
 
-Answer the user's question using ONLY the authoritative
-document excerpts provided below.
+Your job is to answer the user's question using ONLY the
+authoritative legal excerpts supplied below.
+
+The supplied excerpts are the ONLY source of legal information
+you may rely on for this answer.
 
 USER QUESTION:
 {request.query}
@@ -86,22 +120,75 @@ JURISDICTION:
 RESPONSE LANGUAGE:
 {request.language}
 
-AUTHORITATIVE DOCUMENT EXCERPTS:
+AUTHORITATIVE LEGAL EXCERPTS:
 {evidence}
 
-RULES:
-1. Use only the information contained in the excerpts.
-2. Do not invent sections, laws, cases, dates, or legal conclusions.
-3. If the excerpts do not contain enough information to answer,
-   clearly say that the available evidence is insufficient.
-4. Give a concise and understandable answer.
-5. Mention relevant section numbers when they are present
-   in the supplied text.
-6. Do not claim that something is legally true unless supported
+
+STRICT RULES:
+
+1. EVIDENCE ONLY
+   Use only facts, rules, sections, and legal information that
+   are supported by the supplied excerpts.
+
+2. DO NOT HALLUCINATE
+   Never invent:
+   - section numbers
+   - subsections
+   - Acts
+   - regulations
+   - cases
+   - judgments
+   - dates
+   - legal tests
+   - penalties
+   - exceptions
+   - definitions
+   - legal conclusions
+
+3. INSUFFICIENT EVIDENCE
+   If the supplied excerpts do not contain enough information
+   to answer the question, explicitly say that the available
+   documents do not provide sufficient information.
+
+   Do NOT fill missing information using your general knowledge.
+
+4. SECTION NUMBERS
+   Mention section numbers only when they are actually supported
    by the supplied excerpts.
+
+5. SOURCE BOUNDARIES
+   Do not assume that a law, rule, or principle exists merely
+   because it is commonly known.
+
+   If it is not present in the supplied excerpts, do not use it.
+
+6. LEGAL ADVICE
+   Provide legal information based on the supplied documents.
+   Do not present the response as personalized legal advice.
+
+7. CLARITY
+   Answer directly and concisely.
+   Use headings or bullet points when they improve readability.
+
+8. CITATION AWARENESS
+   When discussing a particular rule or requirement, make it clear
+   which section or supplied source supports the statement.
+
+9. CONFLICTS
+   If the supplied excerpts appear to contain conflicting
+   information, do not resolve the conflict using outside
+   knowledge. Clearly identify the conflict.
+
+10. NO OUTSIDE KNOWLEDGE
+    Your own prior knowledge must not be used to supplement
+    missing information.
+
+Before producing the final answer, internally check every
+important legal claim against the supplied excerpts.
 """
 
-        # 4. Generate the grounded answer
+
+        # 5. Generate the grounded answer
         response = client.models.generate_content(
             model=MODEL_NAME,
             contents=prompt
@@ -109,7 +196,7 @@ RULES:
 
         answer = response.text.strip()
 
-        # 5. Build citations from the retrieved evidence
+        # 6. Build citations from retrieved evidence
         citations = []
 
         for document in retrieved_documents:
@@ -122,11 +209,11 @@ RULES:
                 }
             )
 
-        # 6. Return answer + evidence citations
+        # 7. Return answer, citations, and confidence
         return QueryResponse(
             answer=answer,
             citations=citations,
-            confidence="medium",
+            confidence=confidence,
             needs_human_review=True
         )
 

@@ -9,7 +9,7 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 
 # Maximum distance allowed for a retrieved document.
 # Lower distance = more relevant.
-MAX_DISTANCE = 0.95
+MAX_DISTANCE = 999
 
 
 # Load model once when the application starts.
