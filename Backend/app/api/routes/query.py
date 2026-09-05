@@ -20,96 +20,138 @@ router = APIRouter(
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    raise RuntimeError("GEMINI_API_KEY was not found in .env")
+    raise RuntimeError(
+        "GEMINI_API_KEY was not found in .env"
+    )
 
 
-client = genai.Client(api_key=api_key)
+client = genai.Client(
+    api_key=api_key
+)
 
 MODEL_NAME = "gemini-3.5-flash"
 
 
 def calculate_confidence(retrieved_documents):
     """
-    Calculate confidence based on the strongest retrieved evidence.
+    Estimate retrieval confidence.
 
-    Lower Chroma distance means stronger semantic similarity.
-    This represents retrieval confidence, not legal certainty.
+    This represents confidence in the retrieved evidence,
+    not legal certainty.
+
+    Lower ranking_score means stronger retrieved evidence.
     """
 
     if not retrieved_documents:
         return "low"
 
-    best_distance = min(
-        document["distance"]
-        for document in retrieved_documents
+    best_document = retrieved_documents[0]
+
+    ranking_score = best_document.get(
+        "ranking_score"
     )
 
-    if best_distance <= 0.70:
+    if ranking_score is None:
+        return "medium"
+
+    # Simple project-level heuristic.
+    # These are not scientifically calibrated probabilities.
+
+    if ranking_score <= 0.85:
         return "high"
 
-    if best_distance <= 0.85:
+    if ranking_score <= 1.15:
         return "medium"
 
     return "low"
 
 
-@router.post("/query", response_model=QueryResponse)
-async def query_assistant(request: QueryRequest):
+@router.post(
+    "/query",
+    response_model=QueryResponse
+)
+async def query_assistant(
+    request: QueryRequest
+):
 
     try:
-        # 1. Retrieve relevant passages from the legal database
+
+        # -------------------------------------------------
+        # 1. Retrieve relevant legal passages
+        # -------------------------------------------------
+
         retrieved_documents = retrieve_documents(
             request.query,
+            request.jurisdiction,
             top_k=5
         )
 
         if not retrieved_documents:
+
             return QueryResponse(
                 answer=(
-                    "I could not find enough relevant information in "
-                    "the authoritative documents to answer this question."
+                    "I could not find enough relevant "
+                    "information in the authoritative "
+                    "documents to answer this question."
                 ),
                 citations=[],
                 confidence="low",
                 needs_human_review=True
             )
 
+
+        # -------------------------------------------------
         # 2. Calculate retrieval confidence
+        # -------------------------------------------------
+
         confidence = calculate_confidence(
             retrieved_documents
         )
 
+
+        # -------------------------------------------------
         # 3. Build evidence for Gemini
+        # -------------------------------------------------
+
         evidence_parts = []
 
         for index, document in enumerate(
             retrieved_documents,
             start=1
         ):
+
             evidence_parts.append(
                 f"""
 SOURCE {index}
-Source: {document["source_name"]}
-Page: {document["page_number"]}
-Section: {document.get("section")}
-Retrieval distance: {document["distance"]}
+
+Source:
+{document["source_name"]}
+
+Page:
+{document["page_number"]}
+
+Section:
+{document.get("section")}
 
 TEXT:
 {document["text"]}
 """
             )
 
-        evidence = "\n".join(evidence_parts)
+        evidence = "\n".join(
+            evidence_parts
+        )
 
-        # 4. Build a strict evidence-grounded prompt
+
+        # -------------------------------------------------
+        # 4. Build grounded Gemini prompt
+        # -------------------------------------------------
+
         prompt = f"""
 You are an Indian legal information assistant.
 
-Your job is to answer the user's question using ONLY the
-authoritative legal excerpts supplied below.
-
-The supplied excerpts are the ONLY source of legal information
-you may rely on for this answer.
+Answer the user's question using ONLY the authoritative
+legal excerpts supplied below.
 
 USER QUESTION:
 {request.query}
@@ -124,71 +166,84 @@ AUTHORITATIVE LEGAL EXCERPTS:
 {evidence}
 
 
-STRICT RULES:
+RULES:
 
 1. EVIDENCE ONLY
-   Use only facts, rules, sections, and legal information that
-   are supported by the supplied excerpts.
+
+Use only information supported by the supplied excerpts.
 
 2. DO NOT HALLUCINATE
-   Never invent:
-   - section numbers
-   - subsections
-   - Acts
-   - regulations
-   - cases
-   - judgments
-   - dates
-   - legal tests
-   - penalties
-   - exceptions
-   - definitions
-   - legal conclusions
 
-3. INSUFFICIENT EVIDENCE
-   If the supplied excerpts do not contain enough information
-   to answer the question, explicitly say that the available
-   documents do not provide sufficient information.
+Do not invent:
 
-   Do NOT fill missing information using your general knowledge.
+- sections
+- subsections
+- Acts
+- regulations
+- cases
+- judgments
+- dates
+- penalties
+- exceptions
+- definitions
+- legal conclusions
+
+3. INSUFFICIENT INFORMATION
+
+If the supplied excerpts do not contain enough information
+to answer the question, clearly say that the available
+documents do not provide sufficient information.
+
+Do not use outside knowledge to fill missing information.
 
 4. SECTION NUMBERS
-   Mention section numbers only when they are actually supported
-   by the supplied excerpts.
+
+Mention a section number only when it is supported by
+the supplied excerpts.
 
 5. SOURCE BOUNDARIES
-   Do not assume that a law, rule, or principle exists merely
-   because it is commonly known.
 
-   If it is not present in the supplied excerpts, do not use it.
+The supplied excerpts are the only authoritative source
+available for this answer.
 
 6. LEGAL ADVICE
-   Provide legal information based on the supplied documents.
-   Do not present the response as personalized legal advice.
+
+Provide general legal information based on the supplied
+documents.
+
+Do not present the answer as personalized legal advice.
 
 7. CLARITY
-   Answer directly and concisely.
-   Use headings or bullet points when they improve readability.
 
-8. CITATION AWARENESS
-   When discussing a particular rule or requirement, make it clear
-   which section or supplied source supports the statement.
+Answer directly and concisely.
+
+Use headings or bullet points when useful.
+
+8. CITATIONS
+
+When explaining a legal rule, identify the relevant
+section when that section is present in the evidence.
 
 9. CONFLICTS
-   If the supplied excerpts appear to contain conflicting
-   information, do not resolve the conflict using outside
-   knowledge. Clearly identify the conflict.
+
+If the supplied excerpts appear to conflict, do not
+resolve the conflict using outside knowledge.
+
+Clearly identify the conflict.
 
 10. NO OUTSIDE KNOWLEDGE
-    Your own prior knowledge must not be used to supplement
-    missing information.
 
-Before producing the final answer, internally check every
-important legal claim against the supplied excerpts.
+Do not supplement the answer with your own knowledge.
+
+Before answering, verify that the important claims
+are supported by the supplied excerpts.
 """
 
 
-        # 5. Generate the grounded answer
+        # -------------------------------------------------
+        # 5. Generate grounded answer
+        # -------------------------------------------------
+
         response = client.models.generate_content(
             model=MODEL_NAME,
             contents=prompt
@@ -196,20 +251,40 @@ important legal claim against the supplied excerpts.
 
         answer = response.text.strip()
 
-        # 6. Build citations from retrieved evidence
+
+        # -------------------------------------------------
+        # 6. Build citations
+        # -------------------------------------------------
+
         citations = []
 
         for document in retrieved_documents:
+
             citations.append(
                 {
-                    "source_name": document["source_name"],
-                    "page_number": document["page_number"],
-                    "section": document.get("section"),
-                    "highlight_text": document["text"]
+                    "source_name": document[
+                        "source_name"
+                    ],
+
+                    "page_number": document[
+                        "page_number"
+                    ],
+
+                    "section": document.get(
+                        "section"
+                    ),
+
+                    "highlight_text": document[
+                        "text"
+                    ]
                 }
             )
 
-        # 7. Return answer, citations, and confidence
+
+        # -------------------------------------------------
+        # 7. Return final response
+        # -------------------------------------------------
+
         return QueryResponse(
             answer=answer,
             citations=citations,
@@ -217,8 +292,12 @@ important legal claim against the supplied excerpts.
             needs_human_review=True
         )
 
+
     except Exception as exc:
-        print(f"Query error: {exc}")
+
+        print(
+            f"Query error: {exc}"
+        )
 
         raise HTTPException(
             status_code=500,

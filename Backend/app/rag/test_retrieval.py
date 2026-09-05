@@ -1,48 +1,52 @@
-import chromadb
-from sentence_transformers import SentenceTransformer
-
-
-CHROMA_DIR = "app/data/vector_db"
-COLLECTION_NAME = "patents_act"
-
-
-def search(query, top_k=5):
-    print(f"\nSearching for: {query}\n")
-
-    # Load the same embedding model used when building the database
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-
-    # Open our existing ChromaDB
-    client = chromadb.PersistentClient(path=CHROMA_DIR)
-
-    collection = client.get_collection(name=COLLECTION_NAME)
-
-    # Convert the question into an embedding
-    query_embedding = model.encode(query).tolist()
-
-    # Search for the most similar chunks
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=top_k
-    )
-
-    # Display results
-    documents = results["documents"][0]
-    metadatas = results["metadatas"][0]
-    distances = results["distances"][0]
-
-    for i in range(len(documents)):
-        print("=" * 70)
-        print(f"RESULT {i + 1}")
-        print(f"Page: {metadatas[i]['page_number']}")
-        print(f"Distance: {distances[i]:.4f}")
-        print()
-        print(documents[i])
-
-    print("=" * 70)
+from retrieval import retrieve_documents
 
 
 if __name__ == "__main__":
-    question = input("\nEnter your question: ")
 
-    search(question)
+    jurisdiction = input(
+        "Enter jurisdiction (india/international): "
+    ).strip().lower()
+
+    question = input(
+        "Enter your legal question: "
+    )
+
+    results = retrieve_documents(
+        question,
+        jurisdiction,
+        top_k=5
+    )
+
+    print()
+    print("=" * 70)
+
+    if not results:
+        print("No relevant documents found.")
+        print("=" * 70)
+        exit()
+
+    for index, result in enumerate(
+        results,
+        start=1
+    ):
+
+        print(f"RESULT {index}")
+        print(f"Jurisdiction: {result['jurisdiction']}")
+        print(f"Source: {result['source_name']}")
+        print(f"Page: {result['page_number']}")
+        print(f"Section: {result['section']}")
+        print(f"Distance: {result['distance']:.4f}")
+        print(
+            f"Ranking Score: "
+            f"{result['ranking_score']:.4f}"
+        )
+        print(
+            f"Section Match: "
+            f"{result['section_match']}"
+        )
+        print()
+
+        print(result["text"])
+
+        print()
+        print("=" * 70)
