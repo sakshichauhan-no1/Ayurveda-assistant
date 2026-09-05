@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayur-IPR Regulatory Decision Support System | Ministry of Ayush</title>
+  <link rel="stylesheet" href="/workspace.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Official Top Navigation -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <a href="IPSAKTI.HTML" class="back-link" title="Return to Portal">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div class="brand">
+        <i class="fa-solid fa-scale-balanced emblem-icon"></i>
+        <div>
+          <strong>Ayur-IPR Statutory Evaluation System</strong>
+          <span class="sub-brand">Decision Support System | Ministry of Ayush</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jurisdiction & Compliance Controls -->
+    <div class="nav-right">
+      <div class="jurisdiction-box">
+        <label for="btnIndia">Jurisdiction:</label>
+        <div class="toggle-group">
+          <button type="button" class="btn-toggle active" id="btnIndia">India</button>
+          <button type="button" class="btn-toggle" id="btnIntl">International (PCT)</button>
+        </div>
+      </div>
+      <div class="lang-indicator">
+        <i class="fa-solid fa-globe"></i> EN | HI
+      </div>
+    </div>
+  </header>
+
+  <!-- Two-Column Regulatory Workspace -->
+  <main class="workspace-grid">
+
+    <!-- LEFT COLUMN: Grounded Chat & Citation Ledger -->
+    <section class="left-pane">
+      <div class="pane-header">
+        <span class="header-title">
+          <i class="fa-solid fa-comments"></i> STATUTORY DELIBERATION CONSOLE
+        </span>
+        <span class="evidence-status" id="evidenceStatus">
+          <span class="status-indicator live"></span> Regulatory Corpus Connected
+        </span>
+      </div>
+
+      <div class="chat-feed" id="chatFeed">
+        <!-- Messages will be injected dynamically -->
+      </div>
+
+      <!-- Live Input Bar -->
+      <form id="chatForm" class="input-container">
+        <input 
+          type="text" 
+          id="queryInput" 
+          placeholder="Enter formulation details or statutory query (e.g., 'Can I patent an Ashwagandha formulation?')..." 
+          autocomplete="off"
+          class="chat-input"
+        >
+        <button type="submit" class="btn-send" title="Evaluate Query">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </section>
+
+  <!-- RIGHT COLUMN: Real PDF Evidence Viewer -->
+    <section class="right-pane">
+      <!-- Toolbar -->
+      <div class="pane-header pdf-toolbar">
+        <div class="toolbar-left">
+          <i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 8px;"></i>
+          <span class="header-title" id="docTitle">The Patents Act, 1970</span>
+        </div>
+        <div class="toolbar-controls">
+          <button type="button" class="btn-tb" id="prevPageBtn" title="Previous Page"><i class="fa-solid fa-chevron-up"></i></button>
+          <span class="page-counter">
+            Page <input type="number" id="pageNumberInput" value="42" min="1" max="150" class="page-input">
+          </span>
+          <button type="button" class="btn-tb" id="nextPageBtn" title="Next Page"><i class="fa-solid fa-chevron-down"></i></button>
+          <div class="tb-divider"></div>
+          <a href="/sample.pdf" download="The_Patents_Act_1970.pdf" class="btn-tb" title="Download Official PDF">
+            <i class="fa-solid fa-download"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Real PDF Viewer Stage -->
+      <div class="document-stage" id="documentStage" style="position: relative; width: 100%; height: calc(100% - 48px); padding: 0; overflow: hidden;">
+        <!-- Golden Highlight Overlay Layer -->
+        
+        <iframe
+          id="pdfEmbed"
+          src="/sample.pdf#page=42&view=FitH"
+          type="application/pdf"
+          width="100%"
+          height="100%"
+          style="border: none; display: block;"
+        ></iframe>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/workspace.js"></script>
+</body>
+</html>
