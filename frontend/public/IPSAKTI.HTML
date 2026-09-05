@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYUR-IPR Assistant | Ministry of Ayush</title>
+  <!-- Font Awesome for standard Gov icons -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   <!-- Official Indian Govt Web Font (Noto Sans & Noto Serif) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/IPSAKTI.CSS">
+</head>
+<body>
+
+  <!-- ================= TOP PANEL ================= -->
+  <header class="ayush-header">
+    <!-- Top Utility Bar (Accessibility & Standards) -->
+    <div class="top-utility-bar">
+      <div class="container utility-flex">
+        <div class="gov-flag-wrap">
+          <img 
+  src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg" 
+  alt="India Flag" 
+  style="height: 14px; width: 21px; object-fit: cover; border-radius: 2px; vertical-align: middle; margin-right: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.25);"
+/>
+<span>भारत सरकार | Government of India</span>
+        </div>
+        <div class="utility-tools">
+          <a href="#main-content" class="util-link">Skip to Main Content</a>
+          <span class="util-pipe">|</span>
+          <button class="icon-btn" title="Screen Reader"><i class="fa-solid fa-universal-access"></i></button>
+          <button class="icon-btn" title="Text Resize">A-</button>
+          <button class="icon-btn" title="Normal Text">A</button>
+          <button class="icon-btn" title="Increase Text">A+</button>
+          <span class="util-pipe">|</span>
+          <!-- Multilingual Bhashini Toggle -->
+          <div class="lang-picker">
+            <i class="fa-solid fa-language"></i>
+            <select aria-label="Select Language">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="sa">संस्कृतम्</option>
+              <option value="ta">தமிழ்</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Identity Header -->
+    <div class="main-masthead">
+      <div class="container masthead-flex">
+        <div class="brand-left">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="State Emblem of India" class="national-emblem">
+          <div class="brand-text">
+            <span class="hindi-title">आयुष मंत्रालय</span>
+            <span class="eng-title">MINISTRY OF AYUSH</span>
+            <span class="portal-sub">Ayur-IPR & Regulatory Decision Support System</span>
+          </div>
+        </div>
+<div class="brand-right">
+  <div style="display: inline-flex; align-items: center; gap: 8px;">
+    <!-- Aapki leaf image -->
+    <img 
+      src="/ayush-grid-logo.png" 
+      alt="Ayush Grid" 
+      style="height: 32px; width: auto; object-fit: contain;"
+    />
+    <!-- Text Labels matching portal style -->
+    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.15;">
+      <span style="font-weight: 700; font-size: 14px; color: #1e293b;">आयुष ग्रिड</span>
+      <span style="font-weight: 700; font-size: 12px; color: #64748b; letter-spacing: 0.5px;">AYUSH GRID</span>
+    </div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="ayush-nav">
+      <div class="container nav-flex">
+        <ul class="nav-links">
+          <li><a href="#" class="active"><i class="fa-solid fa-house"></i> Home</a></li>
+          <li><a href="#"><i class="fa-solid fa-vial-circle-check"></i> Formulation Classifier</a></li>
+          <li><a href="#"><i class="fa-solid fa-book-bookmark"></i> Section 3(p) & TKDL</a></li>
+          <li><a href="#"><i class="fa-solid fa-dna"></i> ABS & Biodiversity</a></li>
+          <li><a href="#"><i class="fa-solid fa-file-invoice"></i> Statutory Guidance</a></li>
+          <li><a href="#"><i class="fa-solid fa-user-tie"></i> IP Facilitator</a></li>
+        </ul>
+        <div class="nav-auth">
+          <button class="btn-signin" id="signInNavBtn">Sign In</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+<!-- ================= REGULATORY MARQUEE STRIP ================= -->
+<div class="regulatory-ticker">
+  <div class="ticker-badge">
+    <i class="fa-solid fa-bullhorn"></i> STATUTORY UPDATES
+  </div>
+  <div class="ticker-track">
+    <div class="ticker-content">
+      <span><i class="fa-solid fa-circle-dot"></i> Biological Diversity Rules (2024): Streamlined ABS compliance pathways notified for domestic AYUSH manufacturers.</span>
+      <span><i class="fa-solid fa-circle-dot"></i> Patents (Amendment) Rules 2024: Accelerated examination routes operational for registered AYUSH startups.</span>
+      <span><i class="fa-solid fa-circle-dot"></i> WIPO GRATK Treaty (2024): Mandatory disclosure of Indian genetic resources &amp; TK in PCT international applications now in effect.</span>
+      <span><i class="fa-solid fa-circle-dot"></i> FSSAI Ayurveda-Aahar Regulations: New labelling compliance standards enforced for classical-adjacent dietary products.</span>
+    </div>
+  </div>
+  <div class="ticker-controls">
+    <button id="tickerPauseBtn" title="Pause / Resume Ticker"><i class="fa-solid fa-pause"></i></button>
+  </div>
+</div>
+  <!-- ================= MAIN HERO SEARCH SECTION ================= -->
+<main id="main-content" class="hero-search-section">
+  <div class="container">
+    <div class="hero-intro">
+      <span class="sub-tag"><i class="fa-solid fa-brain"></i> AI-POWERED STATUTORY REASONING</span>
+      <h2>Ayurvedic IPR & Regulatory Formulation Portal</h2>
+      <p>Navigate Section 3(p) patent bars, TKDL prior-art conflicts, and Biological Diversity Act (2024) ABS clearances.</p>
+    </div>
+
+    <!-- Active Search Bar Container -->
+    <div class="search-box-card">
+      <div class="search-input-wrapper">
+        <div class="category-select-wrap">
+          <select id="searchDomain" aria-label="Select domain">
+            <option value="all">All Repositories</option>
+            <option value="tkdl">TKDL / Classical Texts</option>
+            <option value="patent">Patents Act § 3(p) / § 3(e)</option>
+            <option value="abs">NBA Biodiversity ABS (2024)</option>
+            <option value="regulatory">Ayurveda-Aahar / FSSAI</option>
+          </select>
+        </div>
+        <input 
+          type="text" 
+          id="formulationSearchInput" 
+          placeholder="Enter Ayurvedic ingredient, botanical name, or formulation (e.g., Ashwagandha, Triphala, Curcumin)..." 
+          autocomplete="off"
+        >
+        <button id="searchExecBtn" class="search-btn">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Analyze</span>
+        </button>
+      </div>
+
+      <!-- Suggested Quick Queries -->
+      <div class="quick-tags">
+        <span class="tag-label">Frequent Assessments:</span>
+        <button class="tag-btn" data-query="Withania somnifera (Ashwagandha)">Withania somnifera (Ashwagandha)</button>
+        <button class="tag-btn" data-query="Chyawanprash Classical Formulation">Chyawanprash Formulation</button>
+        <button class="tag-btn" data-query="Curcumin extraction synergistic patent">Curcumin Nano-extract</button>
+      </div>
+
+      <!-- Quick Analysis Result Dropdown Area -->
+      <div id="quickResultCard" class="result-dropdown" style="display: none;">
+        <div class="result-header">
+          <div class="badge-row">
+            <span id="resTypeBadge" class="status-badge">Classical Formulation</span>
+            <span id="resAbsBadge" class="status-badge abs-badge">Form I NBA Approval Required</span>
+          </div>
+          <button id="closeResultBtn" class="close-res">&times;</button>
+        </div>
+        <h4 id="resTitle">Analysis: Withania somnifera Formulation</h4>
+        <p id="resDesc" class="result-text">Indexed under the First Schedule of the Drugs & Cosmetics Act. Faces strict Section 3(p) traditional knowledge patenting bar unless non-obvious synergistic therapeutic efficacy is proved.</p>
+        <div class="result-actions">
+          <a href="#" class="btn-statute-link"><i class="fa-solid fa-file-shield"></i> View Statutory Precedent</a>
+          <a href="#" class="btn-statute-link abs"><i class="fa-solid fa-dna"></i> Check ABS Clearance Steps</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<!-- ================= NATIONAL IPR & REGULATORY METRICS ================= -->
+<section class="metrics-section">
+  <div class="container">
+    <div class="metrics-grid">
+      
+      <div class="metric-card">
+        <div class="metric-icon-wrap gold">
+          <i class="fa-solid fa-book-atlas"></i>
+        </div>
+        <div class="metric-details">
+          <h3 class="counter" data-target="3200">0</h3>
+          <span class="metric-label">TKDL Prior-Art Formulations</span>
+          <p class="metric-sub">Cross-referenced across 54 First Schedule texts</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrap blue">
+          <i class="fa-solid fa-dna"></i>
+        </div>
+        <div class="metric-details">
+          <h3 class="counter" data-target="1450">0</h3>
+          <span class="metric-label">NBA ABS Approvals Streamlined</span>
+          <p class="metric-sub">Processed under Biological Diversity Rules 2024</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrap green">
+          <i class="fa-solid fa-scale-balanced"></i>
+        </div>
+        <div class="metric-details">
+          <h3 class="counter" data-target="890">0</h3>
+          <span class="metric-label">Section 3(p) Filings Audited</span>
+          <p class="metric-sub">Synergistic & novel extraction pathways mapped</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-wrap purple">
+          <i class="fa-solid fa-globe"></i>
+        </div>
+        <div class="metric-details">
+          <h3 class="counter" data-target="100">0</h3>
+          <span class="metric-label">% WIPO GRATK Aligned</span>
+          <p class="metric-sub">Mandatory international origin disclosure compliance</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ================= STATUTORY WIZARDS & GUIDANCE MODULES ================= -->
+<section class="modules-section">
+  <div class="container">
+    <div class="section-title-wrap">
+      <span class="sub-tag"><i class="fa-solid fa-compass"></i> COMPLIANCE PATHWAYS</span>
+      <h3>Core Statutory Assessment Engines</h3>
+      <p>Select a dedicated regulatory module to run automated compliance checks</p>
+    </div>
+
+    <div class="modules-grid">
+      
+      <!-- Module 1 -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge">Classification</div>
+          <i class="fa-solid fa-vial-circle-check module-icon"></i>
+        </div>
+        <h4>Formulation Classifier</h4>
+        <p>Determine whether your preparation is Classical, Patent & Proprietary, Ayurveda-Aahar (FSSAI), or Phytopharmaceutical.</p>
+        <ul class="module-points">
+          <li><i class="fa-solid fa-check"></i> First Schedule text verification</li>
+          <li><i class="fa-solid fa-check"></i> Synergistic non-obviousness test (§ 3(e))</li>
+        </ul>
+       <button class="btn-module-action" onclick="window.location.href='/workspace.html?mode=classifier'">Launch Classifier &rarr;</button>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="module-card highlighted">
+        <div class="module-card-top">
+          <div class="module-badge gold">Section 3(p) Defense</div>
+          <i class="fa-solid fa-book-bookmark module-icon"></i>
+        </div>
+        <h4>TKDL Prior-Art Scanner</h4>
+        <p>Cross-examine plant parts and active fractions against traditional Indian systems to prevent patent rejections.</p>
+        <ul class="module-points">
+          <li><i class="fa-solid fa-check"></i> Traditional usage conflict detection</li>
+          <li><i class="fa-solid fa-check"></i> Novel extraction & carrier pathway proof</li>
+        </ul>
+       <button class="btn-module-action gold" onclick="window.location.href='/workspace.html?mode=tkdl'">Check Prior Art &rarr;</button>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge">BDA Rules 2024</div>
+          <i class="fa-solid fa-dna module-icon"></i>
+        </div>
+        <h4>ABS Clearance Assistant</h4>
+        <p>Evaluate your Access and Benefit-Sharing obligations with the National Biodiversity Authority (NBA) and SBBs.</p>
+        <ul class="module-points">
+          <li><i class="fa-solid fa-check"></i> Form I (Direct Bio-resource Access)</li>
+          <li><i class="fa-solid fa-check"></i> Form III (Pre-Patent Grant Clearance)</li>
+        </ul>
+        <button class="btn-module-action" onclick="window.location.href='/workspace.html?mode=abs'">Evaluate ABS &rarr;</button>
+      </div>
+
+      <!-- Module 4 -->
+      <div class="module-card">
+        <div class="module-card-top">
+          <div class="module-badge">Expert Connect</div>
+          <i class="fa-solid fa-user-tie module-icon"></i>
+        </div>
+        <h4>IP Facilitator Desk</h4>
+        <p>Escalate ambiguous formulation disputes to empaneled AYUSH patent attorneys and statutory officers.</p>
+        <ul class="module-points">
+          <li><i class="fa-solid fa-check"></i> Verified Ayush legal panel</li>
+          <li><i class="fa-solid fa-check"></i> DPDP compliant case forwarding</li>
+        </ul>
+        <button class="btn-module-action" onclick="window.location.href='/workspace.html?mode=facilitator'">Request Counsel &rarr;</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- Important Government Initiatives Ticker Strip -->
+<div class="gov-initiatives-strip">
+  <!-- Track 1 -->
+  <div class="initiatives-track">
+    <a href="https://pmnrf.gov.in" target="_blank" class="init-item" title="PMNRF">
+      <span class="init-pill">PMNRF</span>
+    </a>
+    <a href="https://swachhbharatmission.ddws.gov.in/" target="_blank" class="init-item" title="Swachh Bharat Mission">
+      <img src="./swach-bharat.png" alt="Swachh Bharat Mission" />
+    </a>
+    <a href="https://data.gov.in" target="_blank" class="init-item" title="Open Government Data">
+      <img src="./data-gov.svg" alt="data.gov.in" />
+    </a>
+    <a href="https://www.digitalindia.gov.in" target="_blank" class="init-item" title="Digital India">
+      <img src="./digital-india.svg" alt="Digital India" />
+    </a>
+    <a href="https://www.mygov.in" target="_blank" class="init-item" title="MyGov India">
+      <img src="./mygov.svg" alt="MyGov" />
+    </a>
+    <a href="https://www.india.gov.in" target="_blank" class="init-item" title="National Portal of India">
+      <img src="./india-gov.svg" alt="india.gov.in" />
+      <div class="init-text-col">
+        <span class="hindi-sub">भारत का राष्ट्रीय पोर्टल</span>
+        <span class="eng-main">india.gov.in</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Track 2 (Exact Duplicate for Infinite Continuous Loop) -->
+  <div class="initiatives-track" aria-hidden="true">
+    <a href="https://pmnrf.gov.in" target="_blank" class="init-item" title="PMNRF">
+      <span class="init-pill">PMNRF</span>
+    </a>
+    <a href="https://swachhbharatmission.ddws.gov.in/" target="_blank" class="init-item" title="Swachh Bharat Mission">
+      <img src="./swach-bharat.png" alt="Swachh Bharat Mission" />
+    </a>
+    <a href="https://data.gov.in" target="_blank" class="init-item" title="Open Government Data">
+      <img src="./data-gov.svg" alt="data.gov.in" />
+    </a>
+    <a href="https://www.digitalindia.gov.in" target="_blank" class="init-item" title="Digital India">
+      <img src="./digital-india.svg" alt="Digital India" />
+    </a>
+    <a href="https://www.mygov.in" target="_blank" class="init-item" title="MyGov India">
+      <img src="./mygov.svg" alt="MyGov" />
+    </a>
+    <a href="https://www.india.gov.in" target="_blank" class="init-item" title="National Portal of India">
+      <img src="./india-gov.svg" alt="india.gov.in" />
+      <div class="init-text-col">
+        <span class="hindi-sub">भारत का राष्ट्रीय पोर्टल</span>
+        <span class="eng-main">india.gov.in</span>
+      </div>
+    </a>
+  </div>
+</div>
+  <!-- ================= BOTTOM PANEL ================= -->
+  <footer class="ayush-footer">
+    <!-- Mandatory Problem Statement Legal Disclaimer -->
+    <div class="footer-disclaimer-strip">
+      <div class="container">
+        <p><i class="fa-solid fa-triangle-exclamation"></i> <strong>Statutory Disclaimer:</strong> This portal is an AI-powered legal guidance assistant aligned with the Patents Act (2024 Rules), Biological Diversity Act (2023/2024), and FSSAI/AYUSH regulations. Information generated is for statutory classification and educational guidance, not formal legal advice.</p>
+      </div>
+    </div>
+
+    <!-- Main Multi-Column Links Area -->
+    <div class="footer-main">
+      <div class="container footer-grid">
+        <!-- Col 1: Ministry Info -->
+        <div class="footer-col">
+          <div class="footer-brand">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem" class="emblem-invert">
+            <h4>आयुष मंत्रालय<br>Ministry of Ayush</h4>
+          </div>
+          <p class="address-line">
+            <i class="fa-solid fa-location-dot"></i> AYUSH Bhawan, B-Block, GPO Complex, INA, New Delhi - 110023
+          </p>
+          <p class="phone-line"><i class="fa-solid fa-phone"></i> 1800-11-0180 / 1800-11-1964</p>
+          <div class="social-icons">
+            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <!-- Col 2: Formulation & Regulatory Pathways -->
+        <div class="footer-col">
+          <h4>Ayurvedic Regulatory Regimes</h4>
+          <ul>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> Classical / Generic Formulations</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> Patent & Proprietary (P&P)</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> Phytopharmaceuticals</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> FSSAI Ayurveda-Aahar Category</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> Drugs & Magic Remedies Compliance</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: IPR & Biodiversity Portals -->
+        <div class="footer-col">
+          <h4>Authoritative Registries</h4>
+          <ul>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> TKDL (CSIR - Ayush)</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> CGPDTM (Indian Patent Office)</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> National Biodiversity Authority (NBA)</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> WIPO GRATK Treaty Database</a></li>
+            <li><a href="#"><i class="fa-solid fa-angle-right"></i> PPV&FR Authority (Plant Varieties)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Platform Metadata & Standards -->
+        <div class="footer-col meta-col">
+          <h4>System Governance</h4>
+          <div class="meta-box">
+            <p><strong>Corpus Version:</strong> 2.4.0 (2026)</p>
+            <p><strong>DPDP Act Compliance:</strong> Enabled</p>
+            <p><strong>Visitors Count:</strong> 314,892</p>
+            <p><strong>Users Active:</strong> 184 Online</p>
+          </div>
+          <div class="tech-badge">
+            <span class="bisag-text">Designed & Developed by <strong>HERBAL_ROOTS</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Copyright Bar -->
+    <div class="footer-bottom-bar">
+      <div class="container bottom-flex">
+        <p>Website content owned and maintained by Ministry of Ayush, Government of India.</p>
+        <div class="bottom-legal-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Audit Logs</a>
+          <a href="#">Help & Escalation</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- Authentication Overlay & Modal -->
+  <div class="auth-modal-overlay" id="authOverlay">
+    <div class="auth-modal">
+      <button class="modal-close" id="modalCloseBtn">&times;</button>
+      
+      <!-- Step A: User vs Admin Selection -->
+      <div id="authRoleStep" class="auth-step active-step">
+        <div class="auth-header">
+          <i class="fa-solid fa-shield-halved auth-icon"></i>
+          <h3>Select Portal Access</h3>
+          <p>Choose your designated access level</p>
+        </div>
+        <div class="role-grid">
+          <button class="role-card" id="chooseUserBtn">
+            <i class="fa-solid fa-user-graduate"></i>
+            <strong>Practitioner / Startup</strong>
+            <span>AYUSH innovator, researcher, or MSME entity</span>
+          </button>
+          <button class="role-card" id="chooseAdminBtn">
+            <i class="fa-solid fa-user-shield"></i>
+            <strong>Ministry / Legal Officer</strong>
+            <span>Admin, NBA / TKDL officer, or IP facilitator</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step B: Sign In Form -->
+      <div id="authFormStep" class="auth-step">
+        <div class="auth-header">
+          <span class="role-badge" id="activeRoleBadge">User Login</span>
+          <h3 id="formTitle">Sign In</h3>
+          <p id="formSub">Access your IPR formulation repository</p>
+        </div>
+        <form class="auth-form" onsubmit="event.preventDefault();">
+          <div class="input-group">
+            <label id="identityLabel">Email / Registered Mobile</label>
+            <input type="text" id="authIdentity" placeholder="Enter identifier" required>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="authPassword" placeholder="Enter password" required>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-submit" id="submitAuthBtn">Proceed</button>
+            <button type="button" class="btn-back" id="backToRolesBtn">Back</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- ================= AI REGULATORY ASSISTANT WIDGET ================= -->
+<div class="ayush-ai-widget">
+  <!-- Floating Trigger Button -->
+  <button id="chatToggleBtn" type="button" class="chat-toggle-btn">
+    <i class="fa-solid fa-robot"></i>
+    <span>AyurLegal AI</span>
+  </button>
+
+  <!-- Expandable Chat Window -->
+  <div id="chatWindow" class="chat-window" style="display: none;">
+    <div class="chat-header">
+      <div class="chat-title">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <span>AyurLegal AI Assistant</span>
+      </div>
+      <button id="closeChatBtn" type="button" class="chat-close-btn">&times;</button>
+    </div>
+
+    <div id="chatMessages" class="chat-body">
+      <div class="chat-msg bot">
+        <div class="msg-bubble">
+          Namaste! I am your AYUSH statutory compliance assistant. Ask me about Section 3(p), TKDL prior art, or NBA Form I/III clearance under BDA Rules 2024.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="userChatInput" placeholder="Ask a question..." autocomplete="off">
+      <button id="sendChatBtn" type="button" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+    <!-- ================= AI REGULATORY ASSISTANT WIDGET ================= -->
+<div class="ayush-ai-widget">
+  <!-- Floating Trigger Button -->
+  <button id="chatToggleBtn" type="button" class="chat-toggle-btn">
+    <i class="fa-solid fa-robot"></i>
+    <span>AyurLegal AI</span>
+  </button>
+
+  <!-- Expandable Chat Window -->
+  <div id="chatWindow" class="chat-window" style="display: none;">
+    <div class="chat-header">
+      <div class="chat-title">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <span>AyurLegal AI Assistant</span>
+      </div>
+      <button id="closeChatBtn" type="button" class="chat-close-btn">&times;</button>
+    </div>
+
+    <div id="chatMessages" class="chat-body">
+      <div class="chat-msg bot">
+        <div class="msg-bubble">
+          Namaste! I am your AYUSH statutory compliance assistant. Ask me about Section 3(p), TKDL prior art, or NBA Form I/III clearance under BDA Rules 2024.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="userChatInput" placeholder="Ask a question..." autocomplete="off">
+      <button id="sendChatBtn" type="button" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+<!-- ================= AI REGULATORY ASSISTANT WIDGET ================= -->
+<div class="ayush-ai-widget">
+  <!-- Floating Trigger Button -->
+  <button id="chatToggleBtn" type="button" class="chat-toggle-btn">
+    <i class="fa-solid fa-robot"></i>
+    <span>AyurLegal AI</span>
+  </button>
+
+  <!-- Expandable Chat Window -->
+  <div id="chatWindow" class="chat-window" style="display: none;">
+    <div class="chat-header">
+      <div class="chat-title">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <span>AyurLegal AI Assistant</span>
+      </div>
+      <button id="closeChatBtn" type="button" class="chat-close-btn">&times;</button>
+    </div>
+
+    <div id="chatMessages" class="chat-body">
+      <div class="chat-msg bot">
+        <div class="msg-bubble">
+          Namaste! I am your AYUSH statutory compliance assistant. Ask me about Section 3(p), TKDL prior art, or NBA Form I/III clearance under BDA Rules 2024.
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="userChatInput" placeholder="Ask a question..." autocomplete="off">
+      <button id="sendChatBtn" type="button" class="btn-send"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+  <script src="/IPSAKTI.JS"></script>
+
+</body>
+</html>
