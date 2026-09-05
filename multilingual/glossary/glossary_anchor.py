@@ -9,38 +9,131 @@ def load_glossary(glossary_path: str | Path) -> list[dict[str, Any]]:
     """
     Load glossary terms from a JSON file.
 
-    Expected structure:
+    Supports both glossary formats:
 
+    Format 1:
     {
         "terms": [
             {
                 "term_id": "...",
-                "category": "...",
-                "preferred_english": "...",
-                "preferred_hindi": "...",
-                "aliases": [...]
+                "english": "...",
+                "hindi": "...",
+                ...
             }
         ]
     }
+
+    Format 2:
+    [
+        {
+            "term_id": "...",
+            "english": "...",
+            "hindi": "...",
+            ...
+        }
+    ]
+
+    Both formats are converted into the internal structure
+    expected by the glossary anchor engine.
     """
 
     path = Path(glossary_path)
 
     if not path.exists():
-        raise FileNotFoundError(f"Glossary file not found: {path}")
+        raise FileNotFoundError(
+            f"Glossary file not found: {path}"
+        )
 
     with path.open("r", encoding="utf-8") as file:
         data = json.load(file)
 
-    if not isinstance(data, dict):
-        raise ValueError("Glossary root must be a JSON object.")
+    # --------------------------------------------------------
+    # Support both glossary formats
+    # --------------------------------------------------------
 
-    terms = data.get("terms")
+    if isinstance(data, dict):
+        terms = data.get("terms")
 
-    if not isinstance(terms, list):
-        raise ValueError("Glossary must contain a 'terms' list.")
+        if not isinstance(terms, list):
+            raise ValueError(
+                "Glossary object must contain a 'terms' list."
+            )
 
-    return terms
+    elif isinstance(data, list):
+        terms = data
+
+    else:
+        raise ValueError(
+            "Glossary root must be either a JSON object "
+            "or a JSON list."
+        )
+
+    # --------------------------------------------------------
+    # Convert entries to the standard internal structure
+    # --------------------------------------------------------
+
+    normalized_terms = []
+
+    for entry in terms:
+
+        if not isinstance(entry, dict):
+            continue
+
+        normalized_entry = {
+            "term_id": entry.get("term_id", ""),
+            "category": entry.get("category", ""),
+
+            # Support your actual glossary field names
+            "preferred_english": entry.get(
+                "preferred_english",
+                entry.get("english", "")
+            ),
+
+            "preferred_hindi": entry.get(
+                "preferred_hindi",
+                entry.get("hindi", "")
+            ),
+
+            # Support both alias formats
+            "aliases": entry.get(
+                "aliases",
+                entry.get("aliases_en", [])
+            ),
+
+            # Preserve additional information
+            "aliases_hi": entry.get(
+                "aliases_hi",
+                []
+            ),
+
+            "do_not_translate": entry.get(
+                "do_not_translate",
+                False
+            ),
+
+            "context": entry.get(
+                "context",
+                ""
+            ),
+
+            "explanation_en": entry.get(
+                "explanation_en",
+                ""
+            ),
+
+            "explanation_hi": entry.get(
+                "explanation_hi",
+                ""
+            )
+        }
+
+        # Skip invalid entries without a term ID
+        if not normalized_entry["term_id"]:
+            continue
+
+        normalized_terms.append(normalized_entry)
+
+    return normalized_terms
 
 
 def normalize_term(term: str) -> str:
