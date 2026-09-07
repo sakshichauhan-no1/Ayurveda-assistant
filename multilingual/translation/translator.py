@@ -8,7 +8,38 @@ from multilingual.glossary.glossary_anchor import (
     find_terms
 )
 
+from multilingual.translation.language_detector import detect_language
 
+# ============================================================
+# COMMON HINDI → ENGLISH WORD MAPPINGS
+# ============================================================
+
+COMMON_HINDI_TO_ENGLISH = {
+    "के बारे में": "about",
+    "की जानकारी": "information",
+    "जानकारी": "information",
+    "आवेदन करें": "apply",
+    "आवेदन": "application",
+    "दर्ज करें": "file",
+    "खोजें": "search",
+    "खोजना": "search",
+    "कैसे": "how",
+    "क्या है": "what is",
+    "क्या": "what",
+    "कौन": "which",
+    "क्यों": "why",
+    "के लिए": "for",
+    "में": "in",
+    "से": "from",
+    "और": "and",
+    "या": "or",
+    "की": "of",
+    "के": "of",
+    "का": "of",
+    "है": "is",
+    "हैं": "are",
+    "चाहिए": "need",
+}
 # ============================================================
 # 1. TRANSLATION PROVIDER INTERFACE
 # ============================================================
@@ -400,7 +431,11 @@ class EnglishHindiTranslator:
         missing_terms = []
 
         for term in terms:
-            preferred_hi = term.get("preferred_hindi")
+            preferred_hi = (
+                        term.get("preferred_hindi")
+                        or term.get("preferred_hi")
+                        or term.get("hindi")
+                                  )
 
             if preferred_hi and preferred_hi not in translated_text:
                 missing_terms.append({
@@ -415,8 +450,8 @@ class EnglishHindiTranslator:
             "original_text": original_text,
             "translated_text": translated_text
         }
-
-    # --------------------------------------------------------
+    
+        # --------------------------------------------------------
     # COMPLETE TRANSLATION PIPELINE
     # --------------------------------------------------------
 
@@ -500,3 +535,355 @@ class EnglishHindiTranslator:
             "final_translation": final_text,
             "validation": validation
         }
+    
+class HindiEnglishTranslator:
+    """
+    Hindi -> English normalization pipeline.
+
+    Main purpose:
+    Convert Hindi glossary terminology into the
+    canonical English terminology required by the
+    future English-centric RAG pipeline.
+    """
+
+    def __init__(self, glossary_engine: Any):
+        self.glossary = glossary_engine
+
+    def detect_terms(
+        self,
+        text: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Detect glossary terms using the existing Day 3 engine.
+        """
+
+        if hasattr(self.glossary, "find_terms"):
+            return self.glossary.find_terms(text)
+
+        return find_terms(
+            text,
+            self.glossary
+        )
+
+    @staticmethod
+    def _get_preferred_english(
+        term: Dict[str, Any]
+    ) -> str | None:
+        """
+        Support the field names used by different
+        versions of the glossary.
+        """
+
+        return (
+            term.get("preferred_english")
+            or term.get("preferred_en")
+            or term.get("english")
+            or term.get("en")
+        )
+
+    def replace_glossary_terms(
+        self,
+        text: str,
+        terms: List[Dict[str, Any]]
+    ) -> str:
+        """
+        Replace Hindi glossary terms with canonical English terms.
+        """
+
+        result = text
+
+        sorted_terms = sorted(
+            terms,
+            key=lambda item: len(
+                item.get("matched_text", "")
+            ),
+            reverse=True
+        )
+
+        for term in sorted_terms:
+
+            matched_text = term.get("matched_text")
+
+            if not matched_text:
+                continue
+
+            preferred_english = self._get_preferred_english(term)
+
+            if not preferred_english:
+                continue
+
+            pattern = re.compile(
+                re.escape(matched_text),
+                re.IGNORECASE
+            )
+
+            result = pattern.sub(
+                preferred_english,
+                result,
+                count=1
+            )
+
+        return result
+
+    @staticmethod
+    def replace_common_hindi(
+        text: str
+    ) -> str:
+        """
+        Replace common Hindi query words.
+        """
+
+        result = text
+
+        sorted_terms = sorted(
+            COMMON_HINDI_TO_ENGLISH.items(),
+            key=lambda item: len(item[0]),
+            reverse=True
+        )
+
+        for hindi_term, english_term in sorted_terms:
+
+            pattern = re.compile(
+                re.escape(hindi_term),
+                re.IGNORECASE
+            )
+
+            result = pattern.sub(
+                english_term,
+                result
+            )
+
+        return result
+
+    @staticmethod
+    def clean_text(text: str) -> str:
+        """
+        Normalize whitespace and punctuation.
+        """
+
+        text = re.sub(r"\s+", " ", text)
+
+        text = re.sub(
+            r"\s+([,.!?;:])",
+            r"\1",
+            text
+        )
+
+        return text.strip()
+
+    def translate(
+        self,
+        text: str
+    ) -> Dict[str, Any]:
+        """
+        Complete Hindi -> English pipeline.
+        """
+
+        if not isinstance(text, str):
+            raise TypeError(
+                "Input text must be a string."
+            )
+
+        if not text.strip():
+            raise ValueError(
+                "Input text cannot be empty."
+            )
+
+        # ----------------------------------------------
+        # 1. Detect glossary terms
+        # ----------------------------------------------
+
+        terms = self.detect_terms(text)
+
+        # ----------------------------------------------
+        # 2. Replace technical Hindi terms
+        #    with canonical English terms
+        # ----------------------------------------------
+
+        translated = self.replace_glossary_terms(
+            text,
+            terms
+        )
+
+        # ----------------------------------------------
+        # 3. Translate common Hindi words
+        # ----------------------------------------------
+
+        translated = self.replace_common_hindi(
+            translated
+        )
+
+        # ----------------------------------------------
+        # 4. Clean final output
+        # ----------------------------------------------
+
+        final_text = self.clean_text(
+            translated
+        )
+
+        return {
+            "source": "hi",
+            "target": "en",
+            "original": text,
+            "detected_terms": terms,
+            "final_translation": final_text,
+        }
+
+
+def translate(
+    text: str,
+    source_language: str = "auto",
+    target_language: str = "en",
+    glossary_path: str | None = None,
+    provider: TranslationProvider | None = None,
+) -> str:
+    """
+    Central Day 5 translation interface.
+
+    Supports:
+        Hindi -> English
+        English -> Hindi
+        Mixed -> English
+        Mixed -> Hindi
+        English -> English
+        Hindi -> Hindi
+
+    source_language:
+        "hi", "en", "mixed", or "auto"
+
+    target_language:
+        "hi" or "en"
+    """
+
+    if not isinstance(text, str):
+        raise TypeError(
+            "text must be a string."
+        )
+
+    if not text.strip():
+        raise ValueError(
+            "Input text cannot be empty."
+        )
+
+    source_language = source_language.lower()
+    target_language = target_language.lower()
+
+    if source_language == "auto":
+        source_language = detect_language(text)
+
+    if source_language == "unknown":
+        return text.strip()
+
+    if target_language not in {"hi", "en"}:
+        raise ValueError(
+            "target_language must be 'hi' or 'en'."
+        )
+
+    if source_language not in {
+        "hi",
+        "en",
+        "mixed"
+    }:
+        raise ValueError(
+            "source_language must be "
+            "'hi', 'en', 'mixed', or 'auto'."
+        )
+
+    # --------------------------------------------------
+    # No translation required
+    # --------------------------------------------------
+
+    if source_language == target_language:
+        return text.strip()
+
+    # --------------------------------------------------
+    # Load glossary
+    # --------------------------------------------------
+
+    if glossary_path is None:
+        raise ValueError(
+            "glossary_path is required when "
+            "translation is needed."
+        )
+
+    glossary = load_glossary(
+        glossary_path
+    )
+
+    # --------------------------------------------------
+    # Hindi -> English
+    # --------------------------------------------------
+
+    if (
+        source_language == "hi"
+        and target_language == "en"
+    ):
+
+        translator = HindiEnglishTranslator(
+            glossary
+        )
+
+        result = translator.translate(text)
+
+        return result["final_translation"]
+
+    # --------------------------------------------------
+    # Mixed -> English
+    # --------------------------------------------------
+
+    if (
+        source_language == "mixed"
+        and target_language == "en"
+    ):
+
+        translator = HindiEnglishTranslator(
+            glossary
+        )
+
+        result = translator.translate(text)
+
+        return result["final_translation"]
+
+    # --------------------------------------------------
+    # English -> Hindi
+    # --------------------------------------------------
+
+    if (
+        source_language == "en"
+        and target_language == "hi"
+    ):
+
+        if provider is None:
+            provider = DemoTranslationProvider()
+
+        translator = EnglishHindiTranslator(
+            glossary_engine=glossary,
+            provider=provider
+        )
+
+        result = translator.translate(text)
+
+        return result["final_translation"]
+
+    # --------------------------------------------------
+    # Mixed -> Hindi
+    # --------------------------------------------------
+
+    if (
+        source_language == "mixed"
+        and target_language == "hi"
+    ):
+
+        if provider is None:
+            provider = DemoTranslationProvider()
+
+        translator = EnglishHindiTranslator(
+            glossary_engine=glossary,
+            provider=provider
+        )
+
+        result = translator.translate(text)
+
+        return result["final_translation"]
+
+    return text.strip()

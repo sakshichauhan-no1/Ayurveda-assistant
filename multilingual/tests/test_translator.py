@@ -3,8 +3,48 @@ import pytest
 
 from multilingual.translation.translator import (
     EnglishHindiTranslator,
-    DemoTranslationProvider
+    DemoTranslationProvider,
+    HindiEnglishTranslator,
+    translate
 )
+from multilingual.translation.language_detector import detect_language
+
+DAY5_GLOSSARY = [
+    {
+        "term_id": "IP_001",
+        "category": "Intellectual Property",
+        "preferred_en": "Patent",
+        "preferred_hindi": "पेटेंट",
+        "aliases_en": ["patent"],
+        "aliases_hi": ["पेटेन्ट"]
+    },
+    {
+        "term_id": "IP_002",
+        "category": "Intellectual Property",
+        "preferred_en": "Prior Art",
+        "preferred_hindi": "पूर्व कला",
+        "aliases_en": ["prior art"],
+        "aliases_hi": []
+    },
+    {
+        "term_id": "TK_001",
+        "category": "Traditional Knowledge",
+        "preferred_en": "Traditional Knowledge",
+        "preferred_hindi": "पारंपरिक ज्ञान",
+        "aliases_en": ["traditional knowledge"],
+        "aliases_hi": []
+    },
+    {
+        "term_id": "AYU_001",
+        "category": "Ayurveda",
+        "preferred_en": "Ayurveda",
+        "preferred_hindi": "आयुर्वेद",
+        "aliases_en": ["ayurvedic"],
+        "aliases_hi": []
+    }
+]
+
+
 
 
 # ------------------------------------------------------------
@@ -160,3 +200,103 @@ def test_case_insensitive_detection(translator):
 
     assert "PAT-001" in ids
 
+def test_day5_hindi_to_english():
+    translator = HindiEnglishTranslator(
+        DAY5_GLOSSARY
+    )
+
+    result = translator.translate(
+        "पेटेंट क्या है?"
+    )
+
+    output = result["final_translation"]
+
+    assert "Patent" in output
+    assert "what is" in output
+
+def test_day5_technical_hindi():
+    translator = HindiEnglishTranslator(
+        DAY5_GLOSSARY
+    )
+
+    result = translator.translate(
+        "पूर्व कला खोजें"
+    )
+
+    output = result["final_translation"]
+
+    assert "Prior Art" in output
+    assert "search" in output
+
+def test_day5_traditional_knowledge():
+    translator = HindiEnglishTranslator(
+        DAY5_GLOSSARY
+    )
+
+    result = translator.translate(
+        "पारंपरिक ज्ञान की जानकारी चाहिए"
+    )
+
+    output = result["final_translation"]
+
+    assert "Traditional Knowledge" in output
+    assert "information" in output
+    assert "need" in output
+
+def test_day5_mixed_language_query():
+    translator = HindiEnglishTranslator(
+        DAY5_GLOSSARY
+    )
+
+    result = translator.translate(
+        "पेटेंट application कैसे file करें?"
+    )
+
+    output = result["final_translation"]
+
+    assert "Patent" in output
+    assert "application" in output
+    assert "file" in output
+    assert "how" in output
+
+def test_day5_detect_hindi():
+    assert detect_language(
+        "पेटेंट क्या है?"
+    ) == "hi"
+
+
+def test_day5_detect_english():
+    assert detect_language(
+        "What is a patent?"
+    ) == "en"
+
+
+def test_day5_detect_mixed():
+    assert detect_language(
+        "पेटेंट application कैसे file करें?"
+    ) == "mixed"
+
+def test_day5_auto_detection():
+    translator = HindiEnglishTranslator(
+        DAY5_GLOSSARY
+    )
+
+    text = "पेटेंट क्या है?"
+
+    detected = detect_language(text)
+
+    assert detected == "hi"
+
+    result = translator.translate(text)
+
+    assert "Patent" in result["final_translation"]
+
+def test_day5_central_translate():
+    result = translate(
+        "पेटेंट क्या है?",
+        source_language="hi",
+        target_language="en",
+        glossary_path="multilingual/glossary/glossary.json"
+    )
+
+    assert "Patent" in result

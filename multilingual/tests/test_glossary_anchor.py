@@ -24,6 +24,9 @@ def glossary(tmp_path):
                     "patent",
                     "patents",
                     "patent protection"
+                ],
+                 "aliases_hi": [
+                   "पेटेन्ट"
                 ]
             },
             {
@@ -35,6 +38,9 @@ def glossary(tmp_path):
                     "prior art",
                     "prior-art",
                     "previous art"
+                ],  
+                "aliases_hi": [
+                 "पिछली कला"
                 ]
             },
             {
@@ -45,6 +51,9 @@ def glossary(tmp_path):
                 "aliases": [
                     "ayurveda",
                     "ayurvedic"
+                ],
+                 "aliases_hi": [
+                    "आयुर्वेदिक"
                 ]
             },
             {
@@ -56,6 +65,9 @@ def glossary(tmp_path):
                     "traditional knowledge",
                     "traditional know-how",
                     "indigenous knowledge"
+                ],
+                      "aliases_hi": [
+                     "परंपरागत ज्ञान"
                 ]
             }
         ]
@@ -88,6 +100,9 @@ def test_normalize_term():
     assert normalize_term(
         "Traditional   Knowledge"
     ) == "traditional knowledge"
+
+    
+    
 
 
 def test_case_insensitive_matching(glossary):
@@ -235,3 +250,42 @@ def test_no_partial_word_match(glossary):
     ]
 
     assert patent_matches == []
+
+def test_hindi_patent_detection(glossary):
+    
+
+    matches = find_terms(
+        "पेटेंट क्या है?",
+        glossary
+    )
+
+    assert len(matches) >= 1
+    assert matches[0]["matched_text"] == "पेटेंट"
+    assert matches[0]["preferred_english"] == "Patent"
+
+
+def test_hindi_prior_art_detection(glossary):
+    
+
+    matches = find_terms(
+        "पूर्व कला खोजें",
+        glossary
+    )
+
+    assert len(matches) >= 1
+    assert matches[0]["matched_text"] == "पूर्व कला"
+    assert matches[0]["preferred_english"] == "Prior Art"
+
+
+def test_hindi_traditional_knowledge_detection(glossary):
+    
+
+    matches = find_terms(
+        "पारंपरिक ज्ञान महत्वपूर्ण है",
+        glossary
+    )
+
+    assert len(matches) >= 1
+    assert matches[0]["matched_text"] == "पारंपरिक ज्ञान"
+    assert matches[0]["preferred_english"] == "Traditional Knowledge"
+

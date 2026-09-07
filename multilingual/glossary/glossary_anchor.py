@@ -138,39 +138,99 @@ def load_glossary(glossary_path: str | Path) -> list[dict[str, Any]]:
 
 def normalize_term(term: str) -> str:
     """
-    Normalize text so matching becomes case-insensitive
-    and tolerant of spacing / punctuation variations.
+    Normalize text for glossary matching.
+
+    Supports:
+    - English
+    - Hindi / Devanagari
+    - case-insensitive matching
+    - hyphen/underscore normalization
+    - punctuation cleanup
+    - whitespace normalization
     """
 
     if not isinstance(term, str):
         raise TypeError("term must be a string")
 
+    # --------------------------------------------------------
     # Unicode normalization
-    term = unicodedata.normalize("NFKC", term)
+    # --------------------------------------------------------
 
+    term = unicodedata.normalize(
+        "NFKC",
+        term
+    )
+
+    # --------------------------------------------------------
     # Case-insensitive normalization
+    #
+    # Works for English and does not damage Hindi.
+    # --------------------------------------------------------
+
     term = term.casefold()
 
+    # --------------------------------------------------------
     # Convert hyphens and underscores to spaces
-    term = re.sub(r"[-_]+", " ", term)
+    # --------------------------------------------------------
 
-    # Remove unnecessary punctuation
-    term = re.sub(r"[^\w\s]", " ", term, flags=re.UNICODE)
+    term = re.sub(
+        r"[-_]+",
+        " ",
+        term
+    )
 
+    # --------------------------------------------------------
+    # Remove punctuation, but KEEP Unicode letters,
+    # numbers, combining marks and whitespace.
+    #
+    # We intentionally do NOT use [^\w\s] here because
+    # that can damage Devanagari combining characters.
+    # --------------------------------------------------------
+
+    cleaned_chars = []
+
+    for char in term:
+
+        category = unicodedata.category(char)
+
+        if (
+            char.isspace()
+            or category[0] in {"L", "N", "M"}
+        ):
+            cleaned_chars.append(char)
+        else:
+            cleaned_chars.append(" ")
+
+    term = "".join(cleaned_chars)
+
+    # --------------------------------------------------------
     # Collapse multiple spaces
-    term = re.sub(r"\s+", " ", term)
+    # --------------------------------------------------------
+
+    term = re.sub(
+        r"\s+",
+        " ",
+        term
+    )
 
     return term.strip()
 
 
-def _build_alias_map(glossary: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+def _build_alias_map(
+    glossary: list[dict[str, Any]]
+) -> dict[str, dict[str, Any]]:
     """
     Build:
 
         normalized alias -> glossary entry
 
-    This makes matching much faster and keeps all aliases
-    connected to the same glossary term.
+    Supports both English and Hindi terminology.
+
+    Searchable forms include:
+    - preferred English
+    - English aliases
+    - preferred Hindi
+    - Hindi aliases
     """
 
     alias_map: dict[str, dict[str, Any]] = {}
@@ -182,25 +242,109 @@ def _build_alias_map(glossary: list[dict[str, Any]]) -> dict[str, dict[str, Any]
         if not term_id:
             continue
 
-        aliases = entry.get("aliases", [])
+        # ----------------------------------------------------
+        # English forms
+        # ----------------------------------------------------
 
-        preferred_english = entry.get("preferred_english", "")
+        preferred_english = (
+            entry.get("preferred_english")
+            or entry.get("preferred_en")
+            or entry.get("english")
+            or ""
+            
+        )
 
-        # Always make preferred English searchable
-        all_aliases = list(aliases)
+        english_aliases = (
+            entry.get("aliases")
+            or entry.get("aliases_en")
+            or []
+            
+        )
+
+        # Support aliases_en explicitly as well.
+        aliases_en = (
+            entry.get("aliases_en")
+            or []
+        )
+
+        # ----------------------------------------------------
+        # Hindi forms
+        # ----------------------------------------------------
+
+        preferred_hindi = (
+            entry.get("preferred_hindi")
+            or entry.get("preferred_hi")
+            or entry.get("hindi")
+            or ""
+            
+        )
+
+        hindi_aliases = (
+            entry.get("aliases_hi")
+            or []
+            
+        )
+
+        # ----------------------------------------------------
+        # Combine every searchable form
+        # ----------------------------------------------------
+
+        all_aliases = []
 
         if preferred_english:
-            all_aliases.append(preferred_english)
+            all_aliases.append(
+                preferred_english
+            )
+
+        if isinstance(english_aliases, list):
+            all_aliases.extend(
+                english_aliases
+            )
+        elif isinstance(english_aliases, str):
+            all_aliases.append(
+                english_aliases
+            )
+
+        if isinstance(aliases_en, list):
+            all_aliases.extend(
+                aliases_en
+            )
+        elif isinstance(aliases_en, str):
+            all_aliases.append(
+                aliases_en
+            )
+
+        if preferred_hindi:
+            all_aliases.append(
+                preferred_hindi
+            )
+
+        if isinstance(hindi_aliases, list):
+            all_aliases.extend(
+                hindi_aliases
+            )
+        elif isinstance(hindi_aliases, str):
+            all_aliases.append(
+                hindi_aliases
+            )
+
+        # ----------------------------------------------------
+        # Add normalized aliases to map
+        # ----------------------------------------------------
 
         for alias in all_aliases:
 
             if not isinstance(alias, str):
                 continue
 
-            normalized_alias = normalize_term(alias)
+            normalized_alias = normalize_term(
+                alias
+            )
 
             if normalized_alias:
-                alias_map[normalized_alias] = entry
+                alias_map[
+                    normalized_alias
+                ] = entry
 
     return alias_map
 
@@ -268,11 +412,17 @@ def find_terms(
                     "end": match.end(),
                     "term_id": entry["term_id"],
                     "category": entry.get("category", ""),
-                    "preferred_english": entry.get(
-                        "preferred_english", ""
+                    "preferred_english": (
+                        entry.get("preferred_english")
+                        or entry.get("preferred_en")
+                        or entry.get("english")
+                        or ""
                     ),
-                    "preferred_hindi": entry.get(
-                        "preferred_hindi", ""
+                    "preferred_hindi": (
+                        entry.get("preferred_hindi")
+                        or entry.get("preferred_hi")
+                        or entry.get("hindi")
+                        or ""
                     )
                 }
             )
