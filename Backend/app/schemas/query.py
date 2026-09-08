@@ -23,3 +23,6 @@ class QueryResponse(BaseModel):
     citations: list[Citation]
     confidence: str
     needs_human_review: bool
+    confidence_score: Optional[float] = None
+    confidence_level: Optional[str] = None
+    human_verification_needed: Optional[str] = None

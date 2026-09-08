@@ -1,4 +1,4 @@
-from retrieval import retrieve_documents
+from .retrieval import retrieve_documents
 
 
 if __name__ == "__main__":
@@ -43,6 +43,12 @@ if __name__ == "__main__":
         print(
             f"Section Match: "
             f"{result['section_match']}"
+        )
+        print(f"Confidence Score: {result.get('confidence_score', 'N/A')}")
+        print(f"Confidence Level: {result.get('confidence_level', 'N/A')}")
+        print(
+            f"Human Verification Needed: "
+            f"{result.get('human_verification_needed', 'N/A')}"
         )
         print()
 

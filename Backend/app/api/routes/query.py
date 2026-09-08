@@ -32,40 +32,6 @@ client = genai.Client(
 MODEL_NAME = "gemini-3.5-flash"
 
 
-def calculate_confidence(retrieved_documents):
-    """
-    Estimate retrieval confidence.
-
-    This represents confidence in the retrieved evidence,
-    not legal certainty.
-
-    Lower ranking_score means stronger retrieved evidence.
-    """
-
-    if not retrieved_documents:
-        return "low"
-
-    best_document = retrieved_documents[0]
-
-    ranking_score = best_document.get(
-        "ranking_score"
-    )
-
-    if ranking_score is None:
-        return "medium"
-
-    # Simple project-level heuristic.
-    # These are not scientifically calibrated probabilities.
-
-    if ranking_score <= 0.85:
-        return "high"
-
-    if ranking_score <= 1.15:
-        return "medium"
-
-    return "low"
-
-
 @router.post(
     "/query",
     response_model=QueryResponse
@@ -95,8 +61,11 @@ async def query_assistant(
                     "documents to answer this question."
                 ),
                 citations=[],
-                confidence="low",
-                needs_human_review=True
+                confidence="Low",
+                needs_human_review=True,
+                confidence_score=0.0,
+                confidence_level="Low",
+                human_verification_needed="High"
             )
 
 
@@ -104,8 +73,21 @@ async def query_assistant(
         # 2. Calculate retrieval confidence
         # -------------------------------------------------
 
-        confidence = calculate_confidence(
-            retrieved_documents
+        best_document = retrieved_documents[0]
+
+        confidence_score = best_document.get(
+            "confidence_score",
+            0.0
+        )
+
+        confidence_level = best_document.get(
+            "confidence_level",
+            "Low"
+        )
+
+        human_verification_needed = best_document.get(
+            "human_verification_needed",
+            "High"
         )
 
 
@@ -288,8 +270,13 @@ are supported by the supplied excerpts.
         return QueryResponse(
             answer=answer,
             citations=citations,
-            confidence=confidence,
-            needs_human_review=True
+            confidence=confidence_level,
+            needs_human_review=(
+                human_verification_needed != "Low"
+            ),
+            confidence_score=confidence_score,
+            confidence_level=confidence_level,
+            human_verification_needed=human_verification_needed
         )
 
 
